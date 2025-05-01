@@ -8,7 +8,7 @@ const connection = mysql.createConnection({
   database: "todochallenge",
 });
 
-// Connect
+
 connection.connect((err) => {
   if (err) {
     console.error("Database connection failed:", err.stack);

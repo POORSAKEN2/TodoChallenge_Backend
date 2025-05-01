@@ -16,7 +16,7 @@ function LoginUser(req, res) {
       .status(400)
       .json({ error: "Username and password are required" });
   }
-
+  
   const sql = "SELECT * FROM users WHERE username = ?";
   db.query(sql, [username], async (err, results) => {
     if (err) return res.status(500).json({ error: "Server error" });
