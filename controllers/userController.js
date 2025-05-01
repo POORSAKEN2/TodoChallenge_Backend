@@ -18,28 +18,17 @@ function LoginUser(req, res) {
   }
 
   const sql = "SELECT * FROM users WHERE username = ?";
-  const values = [username];
-
-  db.query(sql, values, async (err, results) => {
-    if (err) {
-      console.error("Error executing query:", err);
-      return res.status(500).json({ error: "Server error" });
-    }
-
-    if (results.length === 0) {
+  db.query(sql, [username], async (err, results) => {
+    if (err) return res.status(500).json({ error: "Server error" });
+    if (results.length === 0)
       return res.status(401).json({ error: "Invalid username or password" });
-    }
 
     const user = results[0];
-
-    // Use bcrypt.compare (async) for better performance
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
-    if (!isPasswordValid) {
+    if (!isPasswordValid)
       return res.status(401).json({ error: "Invalid username or password" });
-    }
 
-    // Create JWT
     const token = jwt.sign(
       { id: user.id, username: user.username },
       JWT_SECRET,
@@ -49,6 +38,7 @@ function LoginUser(req, res) {
     res.status(200).json({
       message: "Login successful",
       token,
+      user: { id: user.id, username: user.username },
     });
   });
 }
@@ -70,23 +60,13 @@ function RegisterUser(req, res) {
   const insertUserSql = "INSERT INTO users (username, password) VALUES (?, ?)";
 
   db.query(checkUserSql, [username], (err, results) => {
-    if (err) {
-      console.error("Error executing query:", err);
-      return res.status(500).json({ error: "Server error" });
-    }
-
-    if (results.length > 0) {
+    if (err) return res.status(500).json({ error: "Server error" });
+    if (results.length > 0)
       return res.status(400).json({ error: "Username already exists" });
-    }
 
-    // Hash the password
     const hashedPassword = bcrypt.hashSync(password, 10);
-
     db.query(insertUserSql, [username, hashedPassword], (err, results) => {
-      if (err) {
-        console.error("Error executing query:", err);
-        return res.status(500).json({ error: "Server error" });
-      }
+      if (err) return res.status(500).json({ error: "Server error" });
 
       res.status(201).json({
         message: "User registered successfully",

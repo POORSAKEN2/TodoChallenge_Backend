@@ -4,13 +4,17 @@ require("dotenv").config(); // Load .env variables
 
 // Environment variables
 const PORT = process.env.PORT || 8080;
+const cors = require("cors");
+app.use(cors());
 
 // Middleware
 app.use(express.json());
 
 // Routes
 const userRoutes = require("./routes/userRoutes");
+const todoRoutes = require("./routes/todoRoutes");
 app.use("/users", userRoutes);
+app.use("/todos", todoRoutes);
 
 // Start server
 app.listen(PORT, () => {
